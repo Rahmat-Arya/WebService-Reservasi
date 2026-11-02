@@ -17,7 +17,7 @@ export class ReservasiService {
 
   constructor(private readonly lapanganService: LapanganService) {}
 
-  // format tanggal harus YYYY-MM-DD dan benar-benar ada di kalender
+ 
   private tanggalValid(tanggal: string): boolean {
     if (typeof tanggal !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(tanggal)) {
       return false;
@@ -26,7 +26,7 @@ export class ReservasiService {
     return !isNaN(hasil.getTime()) && hasil.toISOString().slice(0, 10) === tanggal;
   }
 
-  // format jam harus HH:mm (00:00 sampai 23:59)
+  
   private jamValid(jam: string): boolean {
     return typeof jam === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(jam);
   }
@@ -35,7 +35,7 @@ export class ReservasiService {
     const { idPengguna, idLapangan, tanggal, jamMulai, jamSelesai, namaPelanggan } =
       data ?? ({} as DataReservasiBaru);
 
-    // 1. validasi input
+  
     const inputValid =
       Number.isInteger(idPengguna) &&
       Number.isInteger(idLapangan) &&
@@ -49,13 +49,13 @@ export class ReservasiService {
       throw new BadRequestException('Data tidak valid');
     }
 
-    // 2. lapangan harus ada (404) dan harus aktif
+   
     const lapangan = this.lapanganService.findOne(idLapangan);
     if (lapangan.status !== 'AKTIF') {
       throw new BadRequestException('Lapangan sedang tidak dapat dipesan');
     }
 
-    // 3. jam mulai harus sebelum jam selesai, dan di dalam jam operasional
+    
     if (jamMulai >= jamSelesai) {
       throw new BadRequestException('jamMulai harus lebih awal dari jamSelesai');
     }
@@ -63,7 +63,7 @@ export class ReservasiService {
       throw new BadRequestException(`Jam operasional ${JAM_BUKA} - ${JAM_TUTUP}`);
     }
 
-    // 4. cek bentrok jadwal (reservasi DIBATALKAN tidak dihitung)
+    
     const bentrok = this.daftarReservasi.find(
       (item) =>
         item.idLapangan === idLapangan &&
@@ -85,7 +85,7 @@ export class ReservasiService {
       });
     }
 
-    // 5. simpan
+    
     const reservasiBaru: Reservasi = {
       id: this.idBerikutnya++,
       idPengguna,
@@ -144,7 +144,7 @@ export class ReservasiService {
       )
       .sort((a, b) => (a.jamMulai < b.jamMulai ? -1 : 1));
 
-    // cari jam kosong di antara slot yang sudah dipesan
+    
     const slotTersedia: { jamMulai: string; jamSelesai: string }[] = [];
     if (lapangan.status === 'AKTIF') {
       let posisi = JAM_BUKA;
